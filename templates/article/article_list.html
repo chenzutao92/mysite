@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+文章列表
+{% endblock %}
+
+{% block content %}
+
+    <ol class="breadcrumb">
+            <li><a href="{% url "index" %}">首页</a></li>
+            <li class="active">{{ b.name }}</li>
+    </ol>
+    <a href="{% url "article_create" b.id %}" class="btn btn-primary">发表文章</a>
+    <br />
+    <br />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>标题</th>
+                <th>作者</th>
+                <th>创建时间</th>
+                <th>最后更新时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+                <tr>
+                    <td><a href="{% url "article_detail" article.id %}">{{ article.title }}</a></td>
+                    <td>{{ article.owner }}</td>
+                    <td>{{ article.create_timestamp|date:"Y-m-d P" }}</td>
+                    <td>{{ article.last_update_timestamp|date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+                {% if pagination_data.has_previous %}
+                    <li>
+                        <a href="?page_no={{ pagination_data.previous_link }}">&laquo;</a>
+                    </li>
+                {% endif %}
+
+                {% for page in pagination_data.page_links %}
+                <li {% if pagination_data.page == pagination_data.current_no %}class="active"{% endif %}>
+                    <a href="?page_no={{ page }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+                {% if pagination_data.has_next %}
+                    <li>
+                        <a href="?page_no={{ pagination_data.next_link }}">&laquo;</a>
+                    </li>
+                {% endif %}
+
+        </ul>
+    </nav>
+{% endblock %}

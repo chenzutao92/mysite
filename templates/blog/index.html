@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+首页
+{% endblock %}
+{% block content %}
+    {% for b in blocks %}
+         <div class="panel panel-default">
+             <div class="panel-heading">
+{#                 <p >{{ b.name }}<a href="{% url "article_list" b.id %}" class="pull-right">更多</a></p>#}
+                 <a href="{% url "article_list" b.id %}" style="font-size: 20px">{{ b.name }}</a>
+             </div>
+             <div class="panel-body">
+                {{ b.desc }}
+             </div>
+         </div>
+    {% endfor %}
+
+{% endblock %}
+

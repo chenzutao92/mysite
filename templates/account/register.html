@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}创建一个帐户{% endblock %}
+{% block content %}
+  <h1>创建一个帐户</h1>
+  <form action="." method="post">
+    {{ user_form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="创建账户"></p>
+  </form>
+{% endblock %}

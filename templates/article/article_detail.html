@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}
+文章详情
+{% endblock %}
+{% block content %}
+    <ol class="breadcrumb">
+            <li><a href="{% url "index" %}">首页</a></li>
+            <li><a href="{% url "article_list" article.block.id %}">文章列表</a></li>
+            <li class="active">{{ article.title }}</li>
+    </ol>
+    <h1>{{ article.title }}</h1>
+    <p>
+        <h6><small>发布时间{{ article.last_update_timestamp }},作者：{{ article.owner }}</small></h6>
+    </p>
+    {% autoescape off %}
+    <p>{{ article.content|linebreaks }}</p>
+    {% endautoescape %}
+    <table class="table table-bordered">
+
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+               <td>用户：{{ comment.owner }}</td>
+                <td><div style="width:80%; font-size: 16px;">
+                    {% if comment.to_comment %}
+                        <blockquote>
+                            <b>{{ comment.to_comment.owner.username }}:</b>
+                            <br />
+                            {{ comment.to_comment.content|linebreaksbr }}
+                        </blockquote>
+                    {% endif %}
+                    {{ comment.content | linebreaksbr }}
+                    <a href="#replyRegion" data-id="{{ comment.id }}"
+                    class="relyBtn btn btn-primary pull-right">回复</a>
+                </div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <nav>
+            <ul class="pagination">
+                {% if pagination_data.has_previous %}
+                    <li>
+                        <a href="?page_no={{ pagination_data.previous_link }}">&laquo;</a>
+                    </li>
+                {% endif %}
+
+                {% for page in pagination_data.page_links %}
+                <li {% if pagination_data.page == pagination_data.current_no %}class="active"{% endif %}>
+                    <a href="?page_no={{ page }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+                {% if pagination_data.has_next %}
+                    <li>
+                        <a href="?page_no={{ pagination_data.next_link }}">&laquo;</a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+        <table>
+            <tbody>
+                <tr>
+                    <td>用户：</td>
+                    <td>
+                        <div class="col-sm-10" id="replyRegion">
+                            <textarea style="margin: 0px -910px 0px 0px;width: 911px;height: 88px;" id="commentContent" name="content" id="contentInput" class="form-control">
+
+                            </textarea>
+                            <br>
+                            <button id="commentBtn" type="submit" class="btn btn-default ">发表</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.csrf.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        var article_id = {{ article.id }};
+        var page_cnt = {{ pagination_data.page_cnt }};
+        var to_comment_id = 0;
+
+        $(".relyBtn").click(function (e) {
+            to_comment_id = parseInt($(e.target).attr("data-id"));
+            $("#commentContent").focus();
+            return false;
+        });
+
+        $("#commentBtn").click(function () {
+           var comment = $("#commentContent").val();
+           var param = {"article_id":article_id,"content":comment,"to_comment_id":to_comment_id};
+           $.post("{% url "comment" %}",param,function (data) {
+              var ret = JSON.parse(data);
+              if (ret["status"] == "ok"){
+                  $("#commentContent").val("");
+                  window.location.href = "/article/detail/{{ article.id }}?page_no=" + 10000
+              }else {
+                  alert(ret["msg"]);
+              }
+           });
+        });
+
+    });
+</script>
+{% endblock %}
